@@ -59,6 +59,7 @@ final class ViewReuseQueue<Key: Hashable, View: UIView & ReusableView> {
     }
 
     @objc private func clearMemory() {
+        print("clearMemory.2")
         queuedViews.removeAll()
     }
 }

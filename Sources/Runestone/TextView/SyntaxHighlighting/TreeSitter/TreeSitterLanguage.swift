@@ -7,6 +7,7 @@ import TreeSitter
 ///
 /// Refer to <doc:AddingATreeSitterLanguage> for more information on adding a Tree-sitter language to your project.
 public final class TreeSitterLanguage {
+    public let name:String
     /// Reference to the raw Tree-sitter language.
     public let languagePointer: UnsafePointer<TSLanguage>
     /// Query used for syntax highlighting.
@@ -34,10 +35,11 @@ public final class TreeSitterLanguage {
     ///   - highlightsQuery: Query used for syntax highlighting.
     ///   - injectionsQuery: Query used for detecting injected languages.
     ///   - indentationScopes: Rules used for indenting text.
-    public init(_ language: UnsafePointer<TSLanguage>,
+    public init(_ name:String, language: UnsafePointer<TSLanguage>,
                 highlightsQuery: TreeSitterLanguage.Query? = nil,
                 injectionsQuery: TreeSitterLanguage.Query? = nil,
                 indentationScopes: TreeSitterIndentationScopes? = nil) {
+        self.name = name
         self.languagePointer = language
         self.highlightsQuery = highlightsQuery
         self.injectionsQuery = injectionsQuery

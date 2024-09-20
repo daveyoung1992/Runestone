@@ -86,6 +86,11 @@ public protocol TextViewDelegate: AnyObject {
     ///
     /// The text view will loop to the first highlighted range in response to calling ``TextView/selectNextHighlightedRange()`` while the last highlighted range is selected.
     func textViewDidLoopToFirstHighlightedRange(_ textView: TextView)
+    /// Tells the delegate that the selected highlighted range is changed.
+    /// - Parameter textView: The text view that looped to the first highlighted range.
+    /// - Parameter highlightedRange: The selected highlight range.
+    /// - Parameter highlightedIndex: The index for selected highlight range.
+    func textViewDidChangeSelectedHighlightedRange(_ textView: TextView, highlightedRange: NSRange, highlightedIndex: Int)
     /// Asks the delegate if the text in the highlighted range can be replaced.
     /// - Parameters:
     ///   - textView: The text view which is about to show a replace action.

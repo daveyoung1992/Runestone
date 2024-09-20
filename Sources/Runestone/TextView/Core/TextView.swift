@@ -637,6 +637,8 @@ open class TextView: UIScrollView {
         let height = baseContentSize.height + verticalOverscrollLength
         return CGSize(width: width, height: height)
     }
+    
+    public var languageName:String?
 
     /// Create a new text view.
     /// - Parameter frame: The frame rectangle of the text view.
@@ -721,9 +723,11 @@ open class TextView: UIScrollView {
     /// This is the preferred way to initially set the text, language and theme on the <code>TextView</code>.
     /// - Parameter state: The new state to be used by the editor.
     /// - Parameter addUndoAction: Whether the state change can be undone. Defaults to false.
-    public func setState(_ state: TextViewState, addUndoAction: Bool = false) {
-        textInputView.setState(state, addUndoAction: addUndoAction)
+    public func setState(_ state: TextViewState, addUndoAction: Bool = false, noClearUndoHistory:Bool = false) {
+        backgroundColor = state.theme.backgroundColor
+        textInputView.setState(state, addUndoAction: addUndoAction,noClearUndoHistory: noClearUndoHistory)
         contentSize = preferredContentSize
+        languageName = state.languageName
     }
 
     /// Returns the row and column at the specified location in the text.
@@ -868,6 +872,13 @@ open class TextView: UIScrollView {
     /// - Returns: True if the text view could navigate to the specified line index, otherwise false.
     @discardableResult
     public func goToLine(_ lineIndex: Int, select selection: GoToLineSelection = .beginning) -> Bool {
+        var lineIndex = lineIndex
+        if lineIndex < 0{
+            lineIndex = 0
+        }
+        if lineIndex >= textInputView.lineManager.lineCount{
+            lineIndex = textInputView.lineManager.lineCount - 1
+        }
         guard lineIndex >= 0 && lineIndex < textInputView.lineManager.lineCount else {
             return false
         }
@@ -1416,8 +1427,7 @@ extension TextView: TextInputViewDelegate {
 
 // MARK: - HighlightNavigationControllerDelegate
 extension TextView: HighlightNavigationControllerDelegate {
-    func highlightNavigationController(_ controller: HighlightNavigationController,
-                                       shouldNavigateTo highlightNavigationRange: HighlightNavigationRange) {
+    func highlightNavigationController(_ controller: HighlightNavigationController, shouldNavigateTo highlightNavigationRange: HighlightNavigationRange, index: Int) {
         let range = highlightNavigationRange.range
         scrollRangeToVisible(range)
         textInputView.selectedTextRange = IndexedRange(range)
@@ -1433,6 +1443,7 @@ extension TextView: HighlightNavigationControllerDelegate {
         case .disabled:
             break
         }
+        editorDelegate?.textViewDidChangeSelectedHighlightedRange(self, highlightedRange: range, highlightedIndex: index)
     }
 }
 

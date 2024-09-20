@@ -6,6 +6,8 @@ public protocol Theme: AnyObject {
     var font: UIFont { get }
     /// Default color of text in the text view.
     var textColor: UIColor { get }
+    /// Background color of the text view.
+    var backgroundColor: UIColor { get }
     /// Background color of the gutter containing line numbers.
     var gutterBackgroundColor: UIColor { get }
     /// Color of the hairline next to the gutter containing line numbers.

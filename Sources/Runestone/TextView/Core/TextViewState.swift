@@ -8,6 +8,7 @@ public final class TextViewState {
     let theme: Theme
     let lineManager: LineManager
     let languageMode: InternalLanguageMode
+    let languageName: String
 
     /// Indent strategy detected in the text.
     ///
@@ -39,6 +40,7 @@ public final class TextViewState {
             languageProvider: languageProvider,
             stringView: stringView,
             lineManager: lineManager)
+        self.languageName = language.name
         prepare(with: text)
     }
 
@@ -53,6 +55,7 @@ public final class TextViewState {
         self.stringView = StringView(string: NSMutableString(string: text))
         self.lineManager = LineManager(stringView: stringView)
         self.languageMode = PlainTextInternalLanguageMode()
+        self.languageName = "PlainText"
         prepare(with: text)
     }
 }

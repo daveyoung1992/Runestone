@@ -557,6 +557,7 @@ private extension LayoutManager {
 // MARK: - Memory Management
 private extension LayoutManager {
     @objc private func clearMemory() {
+        print("clearMemory.1")
         lineControllerStorage.removeAllLineControllers(exceptLinesWithID: visibleLineIDs)
     }
 }

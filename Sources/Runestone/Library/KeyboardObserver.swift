@@ -64,6 +64,7 @@ final class KeyboardObserver {
 
 private extension KeyboardObserver {
     @objc private func keyboardWillShow(notification: Notification) {
+        print("keyboardWillShow.1")
         let animation = createAnimation(from: notification)
         let newKeyboardHeight = keyboardHeight(from: notification)
         if !isKeyboardVisible || newKeyboardHeight != keyboardHeight {
@@ -74,6 +75,7 @@ private extension KeyboardObserver {
     }
 
     @objc private func keyboardWillHide(notification: Notification) {
+        print("keyboardWillHide.1")
         if isKeyboardVisible {
             isKeyboardVisible = false
             let animation = createAnimation(from: notification)
@@ -83,6 +85,7 @@ private extension KeyboardObserver {
     }
 
     @objc private func keyboardWillChangeFrame(notification: Notification) {
+        print("keyboardWillChangeFrame.1")
         if isKeyboardVisible {
             let newKeyboardHeight = keyboardHeight(from: notification)
             if newKeyboardHeight != keyboardHeight {

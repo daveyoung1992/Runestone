@@ -281,6 +281,7 @@ private extension LineController {
             return
         }
         if async {
+            syntaxHighlighter.cancel()
             syntaxHighlighter.syntaxHighlight(input) { [weak self] result in
                 if case .success = result, let self = self {
                     let oldWidth = self.lineWidth

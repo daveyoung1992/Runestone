@@ -785,7 +785,7 @@ final class TextInputView: UIView, UITextInput {
         lineManager.linePosition(at: location)
     }
 
-    func setState(_ state: TextViewState, addUndoAction: Bool = false) {
+    func setState(_ state: TextViewState, addUndoAction: Bool = false, noClearUndoHistory:Bool = false) {
         let oldText = stringView.string
         let newText = state.stringView.string
         stringView = state.stringView
@@ -806,7 +806,7 @@ final class TextInputView: UIView, UITextInput {
                 addUndoOperation(replacing: newRange, withText: oldText as String)
                 timedUndoManager.endUndoGrouping()
             }
-        } else {
+        } else if !noClearUndoHistory {
             timedUndoManager.removeAllActions()
         }
         if let oldSelectedRange = selectedRange {
@@ -923,6 +923,7 @@ final class TextInputView: UIView, UITextInput {
 // MARK: - Theming
 private extension TextInputView {
     private func applyThemeToChildren() {
+        backgroundColor = theme.backgroundColor
         gutterWidthService.font = theme.lineNumberFont
         lineManager.estimatedLineHeight = estimatedLineHeight
         indentController.indentFont = theme.font
@@ -1210,24 +1211,27 @@ extension TextInputView {
         stringView.substring(in: range)
     }
 
-    private func setStringWithUndoAction(_ newString: NSString) {
+    private func setStringWithUndoAction(_ newString: NSString, isUndo: Bool = false) {
         guard newString != string else {
             return
         }
         guard let oldString = stringView.string.copy() as? NSString else {
             return
         }
-        timedUndoManager.endUndoGrouping()
         let oldSelectedRange = selectedRange
         preserveUndoStackWhenSettingString = true
         string = newString
         preserveUndoStackWhenSettingString = false
-        timedUndoManager.beginUndoGrouping()
-        timedUndoManager.setActionName(L10n.Undo.ActionName.replaceAll)
-        timedUndoManager.registerUndo(withTarget: self) { textInputView in
-            textInputView.setStringWithUndoAction(oldString)
+        if !timedUndoManager.isUndoing && !timedUndoManager.isRedoing {
+            timedUndoManager.beginUndoGrouping()
         }
-        timedUndoManager.endUndoGrouping()
+        timedUndoManager.registerUndo(withTarget: self) { textInputView in
+            textInputView.setStringWithUndoAction(oldString, isUndo: !isUndo)
+        }
+        if !isUndo && !timedUndoManager.isUndoing && !timedUndoManager.isRedoing {
+            timedUndoManager.setActionName(L10n.Undo.ActionName.replaceAll)
+            timedUndoManager.endUndoGrouping()
+        }
         delegate?.textInputViewDidChange(self)
         if let oldSelectedRange = oldSelectedRange {
             selectedRange = safeSelectionRange(from: oldSelectedRange)
