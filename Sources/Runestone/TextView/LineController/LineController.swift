@@ -25,10 +25,15 @@ final class LineController {
             }
         }
     }
-    var theme: Theme = DefaultTheme() {
+    var theme: any Theme = DefaultTheme() {
         didSet {
             syntaxHighlighter?.theme = theme
             applyThemeToAllLineFragmentControllers()
+        }
+    }
+    var font: UIFont = .monospacedSystemFont(ofSize: 14, weight: .regular) {
+        didSet {
+            syntaxHighlighter?.font = font
         }
     }
     var estimatedLineFragmentHeight: CGFloat = 15
@@ -102,6 +107,7 @@ final class LineController {
             return cachedSyntaxHighlighter
         } else if let syntaxHighlighter = delegate?.lineSyntaxHighlighter(for: self) {
             syntaxHighlighter.theme = theme
+            syntaxHighlighter.font = font
             cachedSyntaxHighlighter = syntaxHighlighter
             return syntaxHighlighter
         } else {
@@ -242,7 +248,7 @@ private extension LineController {
             if let input = createLineSyntaxHighlightInput() {
                 let defaultStringAttributes = DefaultStringAttributes(
                     textColor: theme.textColor,
-                    font: theme.font,
+                    font: font,
                     kern: kern,
                     tabWidth: tabWidth
                 )

@@ -1,8 +1,10 @@
 import CoreGraphics
 import Foundation
+import UIKit
 
 final class PlainTextSyntaxHighlighter: LineSyntaxHighlighter {
-    var theme: Theme = DefaultTheme()
+    var theme: any Theme = DefaultTheme()
+    var font: UIFont = .monospacedSystemFont(ofSize: 14, weight: .regular)
     var kern: CGFloat = 0
     var canHighlight: Bool {
         false

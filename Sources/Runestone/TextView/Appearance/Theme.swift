@@ -2,8 +2,8 @@ import UIKit
 
 /// Fonts and colors to be used by a `TextView`.
 public protocol Theme: AnyObject {
-    /// Default font of text in the text view.
-    var font: UIFont { get }
+    /// Theme name
+    var name: String { get }
     /// Default color of text in the text view.
     var textColor: UIColor { get }
     /// Background color of the text view.
@@ -16,8 +16,6 @@ public protocol Theme: AnyObject {
     var gutterHairlineWidth: CGFloat { get }
     /// Color of the line numbers in the gutter.
     var lineNumberColor: UIColor { get }
-    /// Font of the line nubmers in the gutter.
-    var lineNumberFont: UIFont { get }
     /// Background color of the selected line.
     var selectedLineBackgroundColor: UIColor { get }
     /// Color of the line number of the selected line.
@@ -37,14 +35,14 @@ public protocol Theme: AnyObject {
     /// Corner radius of the background of marked text. Text will be marked when writing certain languages, for example Chinese and Japanese.
     /// A value of zero or less means that the background will not have rounded corners. Defaults to 0.
     var markedTextBackgroundCornerRadius: CGFloat { get }
+    /// Background color of Highlighted search match
+    var searchMatchHighlighted: UIColor { get }
+    /// Background color of Founded search match
+    var searchMatchFounded: UIColor { get }
     /// Color of text matching the capture sequence.
     ///
     /// See <doc:CreatingATheme> for more information on higlight names.
     func textColor(for highlightName: String) -> UIColor?
-    /// Font of text matching the capture sequence.
-    ///
-    /// See <doc:CreatingATheme> for more information on higlight names.
-    func font(for highlightName: String) -> UIFont?
     /// Traits of text matching the capture sequence.
     ///
     /// See <doc:CreatingATheme> for more information on higlight names.
@@ -79,10 +77,6 @@ public extension Theme {
         0
     }
 
-    func font(for highlightName: String) -> UIFont? {
-        nil
-    }
-
     func fontTraits(for highlightName: String) -> FontTraits {
         []
     }
@@ -95,9 +89,9 @@ public extension Theme {
     func highlightedRange(forFoundTextRange foundTextRange: NSRange, ofStyle style: UITextSearchFoundTextStyle) -> HighlightedRange? {
         switch style {
         case .found:
-            return HighlightedRange(range: foundTextRange, color: .systemYellow.withAlphaComponent(0.2))
+            return HighlightedRange(range: foundTextRange, color: self.searchMatchFounded,cornerRadius: 4)
         case .highlighted:
-            return HighlightedRange(range: foundTextRange, color: .systemYellow)
+            return HighlightedRange(range: foundTextRange, color: self.searchMatchHighlighted,cornerRadius: 4)
         case .normal:
             return nil
         @unknown default:

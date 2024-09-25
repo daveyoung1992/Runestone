@@ -1,14 +1,18 @@
 import UIKit
 
 /// Default theme used by Runestone when no other theme has been set.
-public final class DefaultTheme: Runestone.Theme {
+public final class DefaultTheme: Theme {
+    public static func == (lhs: DefaultTheme, rhs: DefaultTheme) -> Bool {
+        lhs.name == rhs.name
+    }
+    
+    public var name: String = "Default"
+    
     public var backgroundColor: UIColor = UIColor(themeColorNamed: "background")
-    public let font: UIFont = .monospacedSystemFont(ofSize: 14, weight: .regular)
     public let textColor = UIColor(themeColorNamed: "foreground")
     public let gutterBackgroundColor = UIColor(themeColorNamed: "gutter_background")
     public let gutterHairlineColor = UIColor(themeColorNamed: "gutter_hairline")
     public let lineNumberColor = UIColor(themeColorNamed: "line_number")
-    public let lineNumberFont: UIFont = .monospacedSystemFont(ofSize: 14, weight: .regular)
     public let selectedLineBackgroundColor = UIColor(themeColorNamed: "current_line")
     public let selectedLinesLineNumberColor = UIColor(themeColorNamed: "line_number_current_line")
     public let selectedLinesGutterBackgroundColor = UIColor(themeColorNamed: "gutter_background")
@@ -17,6 +21,8 @@ public final class DefaultTheme: Runestone.Theme {
     public let pageGuideBackgroundColor = UIColor(themeColorNamed: "page_guide_background")
     public let markedTextBackgroundColor = UIColor(themeColorNamed: "marked_text")
     public let selectionColor = UIColor(themeColorNamed: "selection")
+    public let searchMatchHighlighted = UIColor(themeColorNamed: "search_match_highlighted")
+    public let searchMatchFounded = UIColor(themeColorNamed: "search_match_found")
 
     public init() {}
 
@@ -65,22 +71,6 @@ public final class DefaultTheme: Runestone.Theme {
             return .bold
         } else {
             return []
-        }
-    }
-
-    @available(iOS 16.0, *)
-    public func highlightedRange(forFoundTextRange foundTextRange: NSRange, ofStyle style: UITextSearchFoundTextStyle) -> HighlightedRange? {
-        switch style {
-        case .found:
-            let color = UIColor(themeColorNamed: "search_match_found")
-            return HighlightedRange(range: foundTextRange, color: color, cornerRadius: 2)
-        case .highlighted:
-            let color = UIColor(themeColorNamed: "search_match_highlighted")
-            return HighlightedRange(range: foundTextRange, color: color, cornerRadius: 2)
-        case .normal:
-            return nil
-        @unknown default:
-            return nil
         }
     }
 }

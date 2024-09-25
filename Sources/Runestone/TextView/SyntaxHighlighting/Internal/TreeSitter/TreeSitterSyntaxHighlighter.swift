@@ -15,7 +15,8 @@ enum TreeSitterSyntaxHighlighterError: LocalizedError {
 }
 
 final class TreeSitterSyntaxHighlighter: LineSyntaxHighlighter {
-    var theme: Theme = DefaultTheme()
+    var theme: any Theme = DefaultTheme()
+    var font: UIFont = .monospacedSystemFont(ofSize: 14, weight: .regular)
     var kern: CGFloat = 0
     var canHighlight: Bool {
         languageMode.canHighlight
@@ -105,7 +106,7 @@ private extension TreeSitterSyntaxHighlighter {
                 symbolicTraits.insert(.traitItalic)
             }
             let currentFont = attributedString.attribute(.font, at: token.range.location, effectiveRange: nil) as? UIFont
-            let baseFont = token.font ?? theme.font
+            let baseFont = token.font ?? font
             let newFont: UIFont
             if !symbolicTraits.isEmpty {
                 newFont = baseFont.withSymbolicTraits(symbolicTraits) ?? baseFont
@@ -148,7 +149,7 @@ private extension TreeSitterSyntaxHighlighter {
         let range = NSRange(byteRange)
         let textColor = theme.textColor(for: capture.name)
         let shadow = theme.shadow(for: capture.name)
-        let font = theme.font(for: capture.name)
+        let font = font
         let fontTraits = theme.fontTraits(for: capture.name)
         return TreeSitterSyntaxHighlightToken(range: range, textColor: textColor, shadow: shadow, font: font, fontTraits: fontTraits)
     }

@@ -35,19 +35,17 @@ final class LayoutManager {
             }
         }
     }
-    var theme: Theme = DefaultTheme() {
+    var theme: any Theme = DefaultTheme() {
         didSet {
             if theme !== oldValue {
                 gutterBackgroundView.backgroundColor = theme.gutterBackgroundColor
                 gutterBackgroundView.hairlineColor = theme.gutterHairlineColor
                 gutterBackgroundView.hairlineWidth = theme.gutterHairlineWidth
-                invisibleCharacterConfiguration.font = theme.font
                 invisibleCharacterConfiguration.textColor = theme.invisibleCharactersColor
                 gutterSelectionBackgroundView.backgroundColor = theme.selectedLinesGutterBackgroundColor
                 lineSelectionBackgroundView.backgroundColor = theme.selectedLineBackgroundColor
                 for lineController in lineControllerStorage {
                     lineController.theme = theme
-                    lineController.estimatedLineFragmentHeight = theme.font.totalLineHeight
                     lineController.invalidateSyntaxHighlighting()
                 }
                 setNeedsLayout()
@@ -56,6 +54,23 @@ final class LayoutManager {
             }
         }
     }
+    
+    var font:UIFont = .monospacedSystemFont(ofSize: 14, weight: .regular){
+        didSet{
+            if font !== oldValue{
+                invisibleCharacterConfiguration.font = font
+                for lineController in lineControllerStorage {
+                    lineController.font = font
+                    lineController.estimatedLineFragmentHeight = font.totalLineHeight
+                    lineController.invalidateSyntaxHighlighting()
+                }
+                setNeedsLayout()
+                setNeedsLayoutLineSelection()
+                layoutIfNeeded()
+            }
+        }
+    }
+    
     var isEditing = false {
         didSet {
             if isEditing != oldValue {
@@ -464,7 +479,7 @@ extension LayoutManager {
             lineNumbersContainerView.addSubview(lineNumberView)
         }
         let lineController = lineControllerStorage.getOrCreateLineController(for: line)
-        let fontLineHeight = theme.lineNumberFont.lineHeight
+        let fontLineHeight = font.lineHeight
         let xPosition = safeAreaInsets.left + gutterWidthService.gutterLeadingPadding
         var yPosition = textContainerInset.top + line.yPosition
         if lineController.numberOfLineFragments > 1 {
@@ -475,7 +490,7 @@ extension LayoutManager {
             yPosition += (lineController.lineHeight - fontLineHeight) / 2
         }
         lineNumberView.text = "\(line.index + 1)"
-        lineNumberView.font = theme.lineNumberFont
+        lineNumberView.font = font
         lineNumberView.textColor = theme.lineNumberColor
         lineNumberView.frame = CGRect(x: xPosition, y: yPosition, width: gutterWidthService.lineNumberWidth, height: fontLineHeight)
     }

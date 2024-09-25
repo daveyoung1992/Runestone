@@ -5,7 +5,8 @@ import UIKit
 /// An instance of `StringSyntaxHighlighter` can be used to syntax highlight a string without needing to create a `TextView`.
 public final class StringSyntaxHighlighter {
     /// The theme to use when syntax highlighting the text.
-    public var theme: Theme
+    public var theme: any Theme
+    public var font: UIFont
     /// The language to use when parsing the text.
     public var language: TreeSitterLanguage
     /// Object that can provide embedded languages on demand. A strong reference will be stored to the language provider.
@@ -27,11 +28,13 @@ public final class StringSyntaxHighlighter {
     ///   - language: The language to use when parsing the text
     ///   - languageProvider: Object that can provide embedded languages on demand. A strong reference will be stored to the language provider..
     public init(
-        theme: Theme = DefaultTheme(),
+        theme: any Theme = DefaultTheme(),
+        font: UIFont,
         language: TreeSitterLanguage,
         languageProvider: TreeSitterLanguageProvider? = nil
     ) {
         self.theme = theme
+        self.font = font
         self.language = language
         self.languageProvider = languageProvider
     }
@@ -54,11 +57,11 @@ public final class StringSyntaxHighlighter {
             lineManager: lineManager
         )
         internalLanguageMode.parse(mutableString)
-        let tabWidth = TabWidthMeasurer.tabWidth(tabLength: tabLength, font: theme.font)
+        let tabWidth = TabWidthMeasurer.tabWidth(tabLength: tabLength, font: font)
         let mutableAttributedString = NSMutableAttributedString(string: text)
         let defaultAttributes = DefaultStringAttributes(
             textColor: theme.textColor,
-            font: theme.font,
+            font: font,
             kern: kern,
             tabWidth: tabWidth
         )
@@ -67,6 +70,7 @@ public final class StringSyntaxHighlighter {
         let byteRange = ByteRange(from: 0, to: text.byteCount)
         let syntaxHighlighter = internalLanguageMode.createLineSyntaxHighlighter()
         syntaxHighlighter.theme = theme
+        syntaxHighlighter.font = font
         let syntaxHighlighterInput = LineSyntaxHighlighterInput(
             attributedString: mutableAttributedString,
             byteRange: byteRange
@@ -78,9 +82,9 @@ public final class StringSyntaxHighlighter {
 
 private extension StringSyntaxHighlighter {
     private func applyLineHeightMultiplier(to attributedString: NSMutableAttributedString) {
-        let scaledLineHeight = theme.font.totalLineHeight * lineHeightMultiplier
+        let scaledLineHeight = font.totalLineHeight * lineHeightMultiplier
         let mutableParagraphStyle = getMutableParagraphStyle(from: attributedString)
-        mutableParagraphStyle.lineSpacing = scaledLineHeight - theme.font.totalLineHeight
+        mutableParagraphStyle.lineSpacing = scaledLineHeight - font.totalLineHeight
         let range = NSRange(location: 0, length: attributedString.length)
         attributedString.beginEditing()
         attributedString.removeAttribute(.paragraphStyle, range: range)

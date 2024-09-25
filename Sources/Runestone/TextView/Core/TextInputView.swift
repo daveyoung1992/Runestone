@@ -138,13 +138,21 @@ final class TextInputView: UIView, UITextInput {
     override var undoManager: UndoManager? {
         timedUndoManager
     }
+    
 
     // MARK: - Appearance
-    var theme: Theme {
+    var theme: any Theme {
         didSet {
             applyThemeToChildren()
         }
     }
+    
+    var font:UIFont{
+        didSet{
+            applyFontToChildren()
+        }
+    }
+    
     var showLineNumbers = false {
         didSet {
             if showLineNumbers != oldValue {
@@ -414,7 +422,7 @@ final class TextInputView: UIView, UITextInput {
         }
     }
     private var estimatedLineHeight: CGFloat {
-        theme.font.totalLineHeight * lineHeightMultiplier
+        font.totalLineHeight * lineHeightMultiplier
     }
     var highlightedRanges: [HighlightedRange] {
         get {
@@ -425,6 +433,21 @@ final class TextInputView: UIView, UITextInput {
                 highlightService.highlightedRanges = newValue
                 layoutManager.setNeedsLayout()
                 layoutManager.layoutIfNeeded()
+            }
+        }
+    }
+    
+    var _inputView:UIView?
+    
+    override var inputView: UIView?{
+        get{
+            _inputView
+        }
+        set{
+            _inputView = newValue
+            reloadInputViews()
+            if !isFirstResponder{
+                becomeFirstResponder()
             }
         }
     }
@@ -610,8 +633,9 @@ final class TextInputView: UIView, UITextInput {
     private var cancellables: [AnyCancellable] = []
 
     // MARK: - Lifecycle
-    init(theme: Theme) {
+    init(theme: any Theme) {
         self.theme = theme
+        self.font = .monospacedDigitSystemFont(ofSize: 14, weight: .regular)
         lineManager = LineManager(stringView: stringView)
         highlightService = HighlightService(lineManager: lineManager)
         lineControllerFactory = LineControllerFactory(stringView: stringView,
@@ -645,12 +669,13 @@ final class TextInputView: UIView, UITextInput {
                                             lineManager: lineManager,
                                             languageMode: languageMode,
                                             indentStrategy: indentStrategy,
-                                            indentFont: theme.font)
+                                            indentFont: font)
         lineMovementController = LineMovementController(lineManager: lineManager,
                                                         stringView: stringView,
                                                         lineControllerStorage: lineControllerStorage)
         super.init(frame: .zero)
         applyThemeToChildren()
+        applyFontToChildren()
         indentController.delegate = self
         lineControllerStorage.delegate = self
         gutterWidthService.gutterLeadingPadding = gutterLeadingPadding
@@ -924,14 +949,17 @@ final class TextInputView: UIView, UITextInput {
 private extension TextInputView {
     private func applyThemeToChildren() {
         backgroundColor = theme.backgroundColor
-        gutterWidthService.font = theme.lineNumberFont
         lineManager.estimatedLineHeight = estimatedLineHeight
-        indentController.indentFont = theme.font
-        pageGuideController.font = theme.font
         pageGuideController.guideView.hairlineWidth = theme.pageGuideHairlineWidth
         pageGuideController.guideView.hairlineColor = theme.pageGuideHairlineColor
         pageGuideController.guideView.backgroundColor = theme.pageGuideBackgroundColor
         layoutManager.theme = theme
+    }
+    private func applyFontToChildren() {
+        gutterWidthService.font = font
+        indentController.indentFont = font
+        pageGuideController.font = font
+        layoutManager.font = font
     }
 }
 
@@ -1616,10 +1644,11 @@ extension TextInputView: LineControllerStorageDelegate {
     func lineControllerStorage(_ storage: LineControllerStorage, didCreate lineController: LineController) {
         lineController.delegate = self
         lineController.constrainingWidth = layoutManager.constrainingLineWidth
-        lineController.estimatedLineFragmentHeight = theme.font.totalLineHeight
+        lineController.estimatedLineFragmentHeight = font.totalLineHeight
         lineController.lineFragmentHeightMultiplier = lineHeightMultiplier
         lineController.tabWidth = indentController.tabWidth
         lineController.theme = theme
+        lineController.font = font
         lineController.lineBreakMode = lineBreakMode
     }
 }

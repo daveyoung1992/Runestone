@@ -1,11 +1,13 @@
 import Foundation
+import UIKit
 
 /// Encapsulates the bare informations needed to do syntax highlighting in a text view.
 ///
 /// It is recommended to create an instance of `TextViewState` on a background queue and pass it to a ``TextView`` instead of setting the text, theme and language on the text view separately.
 public final class TextViewState {
     let stringView: StringView
-    let theme: Theme
+    let theme: any Theme
+    let font: UIFont
     let lineManager: LineManager
     let languageMode: InternalLanguageMode
     let languageName: String
@@ -31,8 +33,9 @@ public final class TextViewState {
     ///   - theme: The theme to use when syntax highlighting the text.
     ///   - language: The language to use when parsing the text.
     ///   - languageProvider: Object that can provide embedded languages on demand. A strong reference will be stored to the language provider.
-    public init(text: String, theme: Theme = DefaultTheme(), language: TreeSitterLanguage, languageProvider: TreeSitterLanguageProvider? = nil) {
+    public init(text: String, theme: any Theme = DefaultTheme(), font: UIFont, language: TreeSitterLanguage, languageProvider: TreeSitterLanguageProvider? = nil) {
         self.theme = theme
+        self.font = font
         self.stringView = StringView(string: NSMutableString(string: text))
         self.lineManager = LineManager(stringView: stringView)
         self.languageMode = TreeSitterInternalLanguageMode(
@@ -50,8 +53,9 @@ public final class TextViewState {
     /// - Parameters:
     ///   - text: The text to display in the text view.
     ///   - theme: The theme to use when syntax highlighting the text.
-    public init(text: String, theme: Theme = DefaultTheme()) {
+    public init(text: String, theme: any Theme = DefaultTheme(), font: UIFont) {
         self.theme = theme
+        self.font = font
         self.stringView = StringView(string: NSMutableString(string: text))
         self.lineManager = LineManager(stringView: stringView)
         self.languageMode = PlainTextInternalLanguageMode()
@@ -63,7 +67,7 @@ public final class TextViewState {
 private extension TextViewState {
     private func prepare(with text: String) {
         let nsString = text as NSString
-        lineManager.estimatedLineHeight = theme.font.totalLineHeight
+        lineManager.estimatedLineHeight = font.totalLineHeight
         lineManager.rebuild()
         languageMode.parse(nsString)
         lengthOfLongestLine = lineManager.initialLongestLine?.data.totalLength
