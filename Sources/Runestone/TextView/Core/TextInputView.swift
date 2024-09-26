@@ -138,7 +138,16 @@ final class TextInputView: UIView, UITextInput {
     override var undoManager: UndoManager? {
         timedUndoManager
     }
+    override var inputAssistantItem: UITextInputAssistantItem {
+        get{
+            return customInputAssistantItem
+        }
+        set{
+            customInputAssistantItem = newValue
+        }
+    }
     
+    var customInputAssistantItem:UITextInputAssistantItem = UITextInputAssistantItem()
 
     // MARK: - Appearance
     var theme: any Theme {
