@@ -988,52 +988,18 @@ open class TextView: UIScrollView {
 // MARK: - UITextInput
 extension TextView {
     
-    public override var inputView: UIView?{
+    open override var inputView: UIView?{
         get{
             textInputView.inputView
         }
         set{
-//            if keyboardObserver.isKeyboardVisible{
-//                newValue?.frame.size.height = keyboardObserver.keyboardHeight
-//            }
-//            else{
-                newValue?.frame.size.height = getKeyboardHeight()
-//            }
             textInputView.inputView = newValue
-            
         }
     }
     
     var isUseSoftKeyboard:Bool{
         isFirstResponder && keyboardObserver.isKeyboardVisible
     }
-    
-    var windowSafeAreaInsets:UIEdgeInsets{
-        var top = 0.0
-        var left = 0.0
-        var right = 0.0
-        var bottom = 0.0
-        var parentView = superview
-        while parentView != nil{
-            top += parentView!.safeAreaInsets.top
-            left += parentView!.safeAreaInsets.left
-            right += parentView!.safeAreaInsets.right
-            bottom += parentView!.safeAreaInsets.bottom
-            parentView = parentView?.superview
-            if bottom > 0 || top > 0 || right > 0 || right > 0{
-                break
-            }
-        }
-        return .init(top: top, left: left, bottom: bottom, right: right)
-    }
-    
-    // 返回键盘高度，基于设备方向
-        private func getKeyboardHeight() -> CGFloat {
-            
-            return 162 + windowSafeAreaInsets.bottom
-//            let isPortrait = UIScreen.main.bounds.height > UIScreen.main.bounds.width
-//            return isPortrait ? 216 : 162
-        }
     
     /// The range of currently marked text in a document.
     public var markedTextRange: UITextRange? {
