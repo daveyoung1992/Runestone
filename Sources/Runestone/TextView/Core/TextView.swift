@@ -988,6 +988,8 @@ open class TextView: UIScrollView {
     public func redisplayVisibleLines() {
         textInputView.redisplayVisibleLines()
     }
+    
+    private var timer:Timer?
 }
 
 // MARK: - UITextInput
@@ -1513,6 +1515,18 @@ extension TextView: KeyboardObserverDelegate {
     func keyboardObserver(_ keyboardObserver: KeyboardObserver,
                           keyboardWillShowWithHeight keyboardHeight: CGFloat,
                           animation: KeyboardObserver.Animation?) {
+        delayScrollToRange()
+//        if isAutomaticScrollEnabled, let newRange = textInputView.selectedRange, newRange.length == 0 {
+//            scrollRangeToVisible(newRange)
+//        }
+    }
+    
+    func delayScrollToRange(){
+        timer?.invalidate()
+        timer = .scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(scrollToRange), userInfo: nil, repeats: false)
+    }
+    
+    @objc func scrollToRange(){
         if isAutomaticScrollEnabled, let newRange = textInputView.selectedRange, newRange.length == 0 {
             scrollRangeToVisible(newRange)
         }
