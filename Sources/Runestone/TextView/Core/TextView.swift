@@ -913,11 +913,33 @@ open class TextView: UIScrollView {
         case .beginning:
             textInputView.selectedRange = NSRange(location: line.location, length: 0)
         case .end:
-            textInputView.selectedRange = NSRange(location: line.data.length, length: line.data.length)
+            textInputView.selectedRange = NSRange(location: line.location+line.data.length, length: 0)
         case .line:
             textInputView.selectedRange = NSRange(location: line.location, length: line.data.length)
         }
         return true
+    }
+    
+    public func goToHome(){
+        if let textLocation = textLocation(at: selectedRange.location){
+            let line = textInputView.lineManager.line(atRow: textLocation.lineNumber)
+            textInputView.layoutLines(toLocation: line.location)
+            scrollLocationToVisible(line.location)
+            textInputView.selectedRange = NSRange(location: line.location, length: 0)
+            insertText("")
+            layoutIfNeeded()
+        }
+    }
+    
+    public func goToEnd(){
+        if let textLocation = textLocation(at: selectedRange.location){
+            let line = textInputView.lineManager.line(atRow: textLocation.lineNumber)
+            textInputView.selectedRange = NSRange(location: line.location+line.data.length, length: 0)
+            textInputView.layoutLines(toLocation: line.location)
+            scrollLocationToVisible(line.location)
+            insertText("")
+            layoutIfNeeded()
+        }
     }
 
     /// Search for the specified query.
